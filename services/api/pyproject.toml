@@ -8,6 +8,11 @@ dependencies = [
   "uvicorn[standard]>=0.30.0",
   "structlog>=24.4.0",
   "psycopg[binary]>=3.2.0",
+<<<<<<< HEAD
+=======
+  "sqlalchemy>=2.0.36",
+  "alembic>=1.14.0",
+>>>>>>> origin/codex/create-initial-walking-skeleton-repository
 ]
 
 [project.optional-dependencies]
