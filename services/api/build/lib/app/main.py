@@ -5,12 +5,6 @@ from contextlib import asynccontextmanager
 import psycopg
 import structlog
 from fastapi import FastAPI
-from fastapi import Depends
-from sqlalchemy import select
-from collections.abc import Generator
-from sqlalchemy.orm import Session
-from app.db import SessionLocal
-from app.models import MenuItem
 
 
 def configure_logging() -> structlog.stdlib.BoundLogger:
@@ -28,13 +22,6 @@ def configure_logging() -> structlog.stdlib.BoundLogger:
 
 
 logger = configure_logging()
-
-def get_session() -> Generator[Session, None, None]:
-    db= SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @asynccontextmanager
@@ -67,8 +54,3 @@ app = FastAPI(lifespan=lifespan)
 def healthcheck() -> dict[str, str]:
     logger.info("healthcheck_requested")
     return {"status": "ok"}
-
-@app.get("/menu")
-def get_menu(db: Session = Depends(get_session)) -> list[dict]:
-    items = db.execute(select(MenuItem)).scalars().all()
-    return [{"id": i.id, "name": i.name, "price_cents": i.price_cents} for i in items]
