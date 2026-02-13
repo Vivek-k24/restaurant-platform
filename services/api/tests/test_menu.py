@@ -4,20 +4,22 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from services.api.app.db import Base
-from services.api.app.main import app, get_session
-from services.api.app.models import MenuItem
-
+from app.db import Base
+from app.main import app, get_session
+from app.models import MenuItem
+from sqlalchemy.pool import StaticPool
 
 def test_menu_returns_empty_list(monkeypatch) -> None:
     fake_connection = MagicMock()
     fake_connection.cursor.return_value.__enter__.return_value = MagicMock()
+    fake_connect_cm = MagicMock()
+    fake_connect_cm.__enter__.return_value = fake_connection
     monkeypatch.setattr(
-        "services.api.app.main.psycopg.connect",
-        MagicMock(return_value=fake_connection),
+        "app.main.psycopg.connect",
+        MagicMock(return_value=fake_connect_cm),
     )
 
-    engine = create_engine("sqlite+pysqlite:///:memory:")
+    engine = create_engine("sqlite+pysqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool,)
     TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
     Base.metadata.create_all(bind=engine)
 
