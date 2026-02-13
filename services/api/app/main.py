@@ -29,16 +29,12 @@ async def lifespan(app: FastAPI):
     database_url = os.getenv(
         "DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/restaurant"
     )
-    skip_db_check = os.getenv("SKIP_DB_CHECK", "").lower() in {"1", "true", "yes"}
-    if skip_db_check:
-        logger.info("database_connection_check_skipped")
-    else:
-        logger.info("database_connection_check_started", database_url=database_url)
-        with psycopg.connect(database_url) as connection:
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT 1")
-                cursor.fetchone()
-        logger.info("database_connection_check_succeeded")
+    logger.info("database_connection_check_started", database_url=database_url)
+    with psycopg.connect(database_url) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+    logger.info("database_connection_check_succeeded")
     yield
 
 
