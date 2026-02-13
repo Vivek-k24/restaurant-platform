@@ -26,16 +26,25 @@ logger = configure_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # SQLAlchemy URL (can contain +psycopg)
     database_url = os.getenv(
-        "DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/restaurant"
+        "DATABASE_URL",
+        "postgresql+psycopg://postgres:postgres@postgres:5432/restaurant",
     )
+
+    # psycopg.connect expects a *psycopg DSN*, NOT a SQLAlchemy dialect URL
+    psycopg_dsn = database_url.replace("postgresql+psycopg://", "postgresql://")
+
     logger.info("database_connection_check_started", database_url=database_url)
-    with psycopg.connect(database_url) as connection:
+
+    with psycopg.connect(psycopg_dsn) as connection:
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
             cursor.fetchone()
+
     logger.info("database_connection_check_succeeded")
     yield
+
 
 
 app = FastAPI(lifespan=lifespan)

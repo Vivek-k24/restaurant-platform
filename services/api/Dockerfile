@@ -3,10 +3,13 @@ FROM python:3.11-slim
 WORKDIR /app
 
 COPY pyproject.toml ./
-RUN pip install --no-cache-dir .[dev]
+RUN pip install --no-cache-dir -U pip && \
+    pip install --no-cache-dir ".[dev]"
 
 COPY app ./app
 COPY tests ./tests
+COPY alembic ./alembic
+COPY alembic.ini ./alembic.ini
 
 EXPOSE 8000
 
