@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "Restaurant Tablet",
+    "slug": "restaurant-tablet",
+    "version": "1.0.0",
+    "orientation": "landscape",
+    "platforms": ["android"],
+    "assetBundlePatterns": ["**/*"]
+  }
+}
